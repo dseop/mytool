@@ -20,11 +20,14 @@ function isElementFound(element) {
     } else { return 'there is no Element' }
 }
 
-const html = await fs.readFile('page.html', 'utf-8');
+const html = fs.readFileSync('page.html', 'utf-8');
+// .readFileSync(): 동기적으로 파일을 읽어오는 메서드
+
+// const html = await fs.readFile('page.html', 'utf-8');
+// .readFile(): 비동기적으로 파일을 읽어옴. 비동기함수 안에서 이 작업을 동기적으로 돌아가게 하기 위해 await가 붙음
+
 async function myAsyncFunction() {
     try {
-        // 파일 읽기
-        const html = await fs.readFile('page.html', 'utf-8');
 
         // HTML 코드를 DOM 객체로 변환
         const dom = new JSDOM(html);
