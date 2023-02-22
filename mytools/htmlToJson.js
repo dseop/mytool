@@ -1,18 +1,6 @@
-const webdriver = require('selenium-webdriver');
-const chrome = require('selenium-webdriver/chrome')
-const chromedriver = require('chromedriver');
+// HTML JSON function
 const { JSDOM } = require('jsdom');
-const fs = require('fs').promises;
-
-let options = new chrome.Options();
-options.addArguments('headless'); // Chrome을 headless 모드로 실행
-
-// Chrome 드라이버 생성
-const driver = new webdriver.Builder()
-    .forBrowser('chrome')
-    .setChromeOptions(options)
-    .build();
-
+const fs = require('fs');
 
 function isElementFound(element) {
     if (element !== null) {
@@ -20,16 +8,51 @@ function isElementFound(element) {
     } else { return 'there is no Element' }
 }
 
-const html = fs.readFileSync('page.html', 'utf-8');
+
+// load file
+const html = fs.readFileSync('test.html', 'utf-8');
 // .readFileSync(): 동기적으로 파일을 읽어오는 메서드
 
 // const html = await fs.readFile('page.html', 'utf-8');
 // .readFile(): 비동기적으로 파일을 읽어옴. 비동기함수 안에서 이 작업을 동기적으로 돌아가게 하기 위해 await가 붙음
 
-async function myAsyncFunction() {
-    try {
 
-        // HTML 코드를 DOM 객체로 변환
+async function test(html) {
+    try {
+        const maxSn = 150;
+
+        const dom = new JSDOM(html);
+        const document = dom.window.document;
+
+        // check total number of saling house
+        let saleNumbers = document.querySelectorAll('.sale_number');
+        let sumSn = 0;
+        saleNumbers.forEach( sns => {
+            let sn = parseInt(sns.childNodes[0].textContent, 10)
+            sumSn += sn;
+            console.log(`+${sn} = ${sumSn}`);
+        });
+        console.log(`*total search result: ${sumSn}`)
+
+        // scroll
+
+        //
+        console.log(result)     
+
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+test(html);
+
+
+
+// HTML -> JSON
+async function htmlToJson(html) {
+    try {
+    
+        // string HTML -> DOM obj
         const dom = new JSDOM(html);
         const document = dom.window.document;
 
@@ -71,7 +94,7 @@ async function myAsyncFunction() {
         const jsonResult = JSON.stringify(extractedData);
         console.log(jsonResult)
 
-        await driver.quit(); // 브라우저 종료
+        // await driver.quit(); // 브라우저 종료
         console.log("ok")
 
     } catch (err) {
@@ -79,4 +102,4 @@ async function myAsyncFunction() {
     }
 }
 
-myAsyncFunction();
+// htmlToJson(html);

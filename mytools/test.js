@@ -16,14 +16,18 @@ const driver = new webdriver.Builder()
     .setChromeOptions(options)
     .build();
 
-// function
+// get url -> html
+async function urlToHtml(url) {
+
+    await driver.get(targetUrl);
+
+}
+
 
 async function myAsyncFunction() {
 
-    let url = 'https://new.land.naver.com/houses?ms=37.5538871,126.9071715,17&a=VL:DDDGG:JWJT:SGJT:HOJT&b=B1:A1&e=RETAIL&g=30000&j=10&q=TWOROOM';
-
-    await driver.get(url);
-
+    let targetUrl = 'https://new.land.naver.com/houses?ms=37.5538871,126.9071715,17&a=VL:DDDGG:JWJT:SGJT:HOJT&b=B1:A1&e=RETAIL&g=30000&j=10&q=TWOROOM';
+    
     await driver.wait(webdriver.until.elementLocated(webdriver.By.css('div.loader')), 5000);
     // driver.wait(): 조건을 기다리며 대기. 대기한 시간과 충족한 결과를 반환.
     // webdriver.until.elementLocated(): 인수로 전달된 Locator로 DOM 요소가 생성될 때를 기다림
