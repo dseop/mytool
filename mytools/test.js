@@ -81,6 +81,9 @@ async function myAsyncFunction() {
         const mainInfoArea = await driver.executeScript("return document.querySelector('.main_info_area')", detailContentsInner);
         const detailBoxSummary = await driver.executeScript("return document.querySelector('.detail_box--summary')", detailContentsInner);
         const detailBoxLedger = await driver.executeScript("return document.querySelector('.detail_box--ledger')", detailContentsInner);        
+        /////////////////////////////////////// ************************************
+        //여기 executeScript라고 된 이유를 알았다. 원래는 window 객체를 담은 document객체를 새로 만들어서 document에 저장하고
+        //그걸 가지고 querySelector 같은 작업을 했어야 했는데 여기서는 그냥 Webdriver에서 처리하고 있구나
 
         // const mainInfoAreaText = await driver.executeScript("return arguments[0].textContent", mainInfoArea);
         // const detailBoxSummaryText = await driver.executeScript("return arguments[0].textContent", detailBoxSummary);
