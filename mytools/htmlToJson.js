@@ -46,18 +46,19 @@ async function real() {
         const maxSn = Math.min(150, sumSn); // sumSn과 비교, 최대 Sn값 설정. 너무 많은 경우 다 불러오느라 밤새지 않도록.
 
         const loader = await driver.findElement(webdriver.By.css('div.loader')); // 스크롤한 후에 로딩은 20개씩 됨
-        for (let i = 0; i < Math.ceil((maxSn - 20) / 20); i++) { // Math.ceil(): 소수점 1의 자리 올림 // 나중에 수정 필요
-            break; // 테스트용. 임시로 넣어둔 것 <------------------- 스크롤 없애기
+        let countScroll = 0;
+        for (countScroll; countScroll < Math.ceil((maxSn - 20) / 20); countScroll++) { // Math.ceil(): 소수점 1의 자리 올림 // 나중에 수정 필요
+            // break; // 테스트용. 임시로 넣어둔 것 <------------------- 스크롤 없애기
             try {
                 await driver.executeScript('arguments[0].scrollIntoView();', loader); // scrollIntoView() 메서드: 해당 요소가 현재 뷰포트에서 보이도록 스크롤
-                console.log(`${i+1}회 스크롤`)
             } catch (err) {
-                console.log(err)
+                console.log(err);
             }
 
             const waitTime = Math.floor(Math.random() * 2) + 0.5; // 0.5~1.5 사이의 랜덤한 정수 생성
             await driver.sleep(waitTime * 1000); // 랜덤한 대기 시간 적용 (밀리초 단위로 변환)
         }
+        console.log(countScroll, 'scrolled!');
 
         // 파일로 문자열 저장
         // const allScrollHtml = await driver.getPageSource();
@@ -79,17 +80,27 @@ async function real() {
 
         // allScrollItems 수 만큼 반복
         let extractedDatas = []
+        
         for (let i = 0; i < allScrollItems.length; i++) {
-            
+            console.log(`crawling ${i+1} estate`);
+
             // Click
             await allScrollItems[i].click();
+            console.log('2초 기다린다... 여기서 로딩이 실패하면 망하는 거임'); // error 가능성 있음
+            await driver.sleep(2000);
+            let readyState = await driver.executeScript('return document.readyState');
+            while (readyState !== 'complete') {
+                console.log('2초 더 기다린다...'); // error 가능성 있음
+                await driver.sleep(2000);
+                readyState = await driver.executeScript('return document.readyState');
+            }
             await driver.wait(webdriver.until.elementLocated(webdriver.By.className('detail_panel')), 2000);
             
             // crawling
-            const detailPanel = await driver.findElement(webdriver.By.className('detail_panel'));
-            const detailHtml = await detailPanel.getAttribute('innerHTML');
-            const detailDom = new JSDOM(detailHtml);
-            const document = detailDom.window.document;
+            let detailPanel = await driver.findElement(webdriver.By.className('detail_panel'));
+            let detailHtml = await detailPanel.getAttribute('innerHTML');
+            let detailDom = new JSDOM(detailHtml);
+            let document = detailDom.window.document;
 
             let extractedData = {};
 
@@ -103,6 +114,8 @@ async function real() {
             '중개사': isElementFound(document.querySelector('.name')).textContent,
             '번호': isElementFound(document.querySelector('.number')).textContent
             };
+
+            console.log(extractedData['MainInfo']);
 
             // detailBoxSummary
             const detailBoxSummary = document.querySelector('.detail_box--summary');
@@ -124,7 +137,7 @@ async function real() {
             // push to array
             extractedDatas.push(extractedData);          
 
-            break; // 테스트용. 임시로 넣어둔 것 <------------------- 반복 없애기
+            // break; // 테스트용. 임시로 넣어둔 것 <------------------- 반복 없애기
 
             // 시간 차 두고 반복
             const waitTime = Math.floor(Math.random() * 2) + 0.5; // 0.5~1.5 사이의 랜덤한 정수 생성
@@ -134,7 +147,16 @@ async function real() {
         // array to json
         const jsonResults = JSON.stringify(extractedDatas);
         console.log(`jsonResults에 총 ${jsonResults.length}개의 매물이 입력되었습니다.`)
-        console.log(jsonResults)
+
+        // 파일에 JSON 문자열 저장
+        fs.writeFile('data.json', jsonString, (err) => {
+            if (err) {
+            console.error(err);
+            return;
+            }
+            console.log('JSON 파일이 저장되었습니다.');
+        });
+        // console.log(jsonResults)
 
         await driver.quit(); // 브라우저 종료
     } catch (err) {
@@ -143,21 +165,9 @@ async function real() {
     }
 }
 
-// 원하는 형태로 보여주기
-async function test() {
-    // load json file
-    const fs = require('fs');
+real();
 
-    fs.readFile('data.json', (err, data) => {
-    if (err) throw err;
-    const jsonData = JSON.parse(data);
-    // console.log(jsonData);
-    });
-
-    
-}
-
-test();
+// 원하는 형태로 보여주기 ---> React App에서 실습 ---> showJson.js
 
 
 // 실제 동작 때는 break; 찾아서 없애기 <-------------------
