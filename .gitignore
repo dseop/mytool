@@ -156,5 +156,4 @@ sketch
 
 # End of https://www.toptal.com/developers/gitignore/api/react,node
 mytools/data.json
-mytools-client/data.json
-mytools/data.json
+mytools-client/src/data.json
