@@ -20,6 +20,15 @@ function isElementFound(element) {
     } else { return '' }
 }
 
+// 오늘 날짜 yymmdd 만들기
+let now = new Date();
+let year = now.getFullYear().toString().slice(-2);
+let month = ("0" + (now.getMonth() + 1)).slice(-2);
+let date = ("0" + now.getDate()).slice(-2);
+
+let yymmdd = year + month + date;
+console.log(yymmdd); // 예시: 220219
+
 // scroll page to end: sumSn을 기준으로 실행
 async function real() {
     try {
@@ -174,7 +183,7 @@ async function real() {
         console.log(`jsonResults에 총 ${jsonResults.length}개의 매물이 입력되었습니다.`)
 
         // 파일에 JSON 문자열 저장
-        fs.writeFile('data.json', jsonResults, (err) => {
+        fs.writeFile(`data/data${yymmdd}.json`, jsonResults, (err) => {
             if (err) {
             console.error(err);
             return;
@@ -192,7 +201,7 @@ async function real() {
         console.log(`jsonResults에 총 ${jsonResults.length}개의 매물이 입력되었습니다.`)
 
         // 파일에 JSON 문자열 저장
-        fs.writeFile('data.json', jsonResults, (err) => {
+        fs.writeFile(`data/data${yymmdd}.json`, jsonResults, (err) => {
             if (err) {
             console.error(err);
             return;
